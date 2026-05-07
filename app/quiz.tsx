@@ -1,28 +1,47 @@
 // app/quiz.tsx
-// app/quiz.tsx
 
 import {
-    Feather,
-    Ionicons,
-    MaterialCommunityIcons,
+  Feather,
+  Ionicons,
+  MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    Alert,
-    Animated,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    useColorScheme,
-    View,
+  Alert,
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getQuizData, type QuizQuestion } from "../data/quizIndex";
+import { getQuizData } from "../data/quizIndex";
 
+type RawQuestion = {
+  question_number: string;
+  question: string;
+  options: Record<string, string>;
+  answer: string;
+  explanation?: string;
+};
 
+type RawSection = {
+  context?: string;
+  questions: RawQuestion[];
+};
 
+type QuizQuestion = {
+  id: string;
+  questionNumber: string;
+  context?: string;
+  question: string;
+  options: string[];
+  answerIndex: number;
+  explanation: string;
+};
 
 type RouteParams = {
   paper?: string | string[];
@@ -36,7 +55,73 @@ function firstValue(value: string | string[] | undefined) {
   return value ?? "";
 }
 
+function normalizeQuizData(data: unknown): QuizQuestion[] {
+  if (!Array.isArray(data)) return [];
 
+  const firstItem = data[0] as any;
+
+  // Case 1: section-based structure: [{ context, questions: [...] }, ...]
+  if (firstItem && Array.isArray(firstItem.questions)) {
+    const sections = data as RawSection[];
+
+    const normalized: QuizQuestion[] = [];
+
+    sections.forEach((section) => {
+      section.questions.forEach((q) => {
+        const answerIndex = Number(q.answer) - 1;
+
+        normalized.push({
+          id: q.question_number,
+          questionNumber: q.question_number,
+          context: section.context?.trim() || undefined,
+          question: q.question,
+          options: ["1", "2", "3", "4"].map((key) => q.options?.[key] ?? ""),
+          answerIndex,
+          explanation: q.explanation ?? "",
+        });
+      });
+    });
+
+    return normalized;
+  }
+
+  // Case 2: already-flat question structure
+  if (firstItem && "options" in firstItem && "answer" in firstItem) {
+    const flatQuestions = data as RawQuestion[];
+
+    return flatQuestions.map((q) => ({
+      id: q.question_number,
+      questionNumber: q.question_number,
+      question: q.question,
+      options: ["1", "2", "3", "4"].map((key) => q.options?.[key] ?? ""),
+      answerIndex: Number(q.answer) - 1,
+      explanation: q.explanation ?? "",
+    }));
+  }
+
+  return [];
+}
+
+function calculateStats(
+  questions: QuizQuestion[],
+  selectedAnswers: Record<string, number>
+) {
+  let attempted = 0;
+  let correct = 0;
+  let wrong = 0;
+
+  questions.forEach((q) => {
+    const ans = selectedAnswers[q.id];
+    if (ans === undefined) return;
+
+    attempted += 1;
+    if (ans === q.answerIndex) correct += 1;
+    else wrong += 1;
+  });
+
+  const left = questions.length - attempted;
+  return { attempted, correct, wrong, left };
+}
 
 export default function QuizScreen() {
   const scheme = useColorScheme();
@@ -47,8 +132,6 @@ export default function QuizScreen() {
   const paperType = firstValue(params.paperType);
   const subject = firstValue(params.subject);
   const year = firstValue(params.year);
-
-  
 
   const colors = {
     background: isDark ? "#0B1020" : "#F6F8FC",
@@ -66,52 +149,61 @@ export default function QuizScreen() {
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
-  const [bookmarked, setBookmarked] = useState<Record<number, boolean>>({});
-  const [secondsLeft, setSecondsLeft] = useState(90 * 60); // 90 minutes, change later
+const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
+const [bookmarked, setBookmarked] = useState<Record<string, boolean>>({});
+  const [secondsLeft, setSecondsLeft] = useState(90 * 60);
   const progressAnim = useRef(new Animated.Value(0)).current;
 
- useEffect(() => {
-  try {
-    const data = getQuizData({
-      paper,
-      paperType,
-      subject,
-      year,
-    });
+  const questionsRef = useRef<QuizQuestion[]>([]);
+  const selectedAnswersRef = useRef<Record<number, number>>({});
+  const secondsLeftRef = useRef(90 * 60);
 
-    if (!data) {
-      Alert.alert(
-        "Quiz Not Available",
-        `No quiz found for:\n\n${paper}\n${paperType}\n${subject}\n${year}`
-      );
+  useEffect(() => {
+    questionsRef.current = questions;
+  }, [questions]);
 
+  useEffect(() => {
+    selectedAnswersRef.current = selectedAnswers;
+  }, [selectedAnswers]);
+
+  useEffect(() => {
+    secondsLeftRef.current = secondsLeft;
+  }, [secondsLeft]);
+
+  useEffect(() => {
+    try {
+      const data = getQuizData({
+        paper,
+        paperType,
+        subject,
+        year,
+      });
+
+      const normalized = normalizeQuizData(data);
+
+      if (!normalized.length) {
+        Alert.alert(
+          "Quiz Not Available",
+          `No quiz found for:\n\n${paper}\n${paperType}\n${subject}\n${year}`
+        );
+        setQuestions([]);
+        return;
+      }
+
+      setQuestions(normalized);
+
+      setCurrentIndex(0);
+      setSelectedAnswers({});
+      setBookmarked({});
+      setSecondsLeft(90 * 60);
+    } catch (error) {
+      console.log("Quiz loading error:", error);
+      Alert.alert("Error", "Something went wrong while loading the quiz.");
       setQuestions([]);
-
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    setQuestions(data);
-
-    // reset quiz states
-    setCurrentIndex(0);
-    setSelectedAnswers({});
-    setBookmarked({});
-    setSecondsLeft(90 * 60);
-
-  } catch (error) {
-    console.log("Quiz loading error:", error);
-
-    Alert.alert(
-      "Error",
-      "Something went wrong while loading the quiz."
-    );
-
-    setQuestions([]);
-  } finally {
-    setLoading(false);
-  }
-}, [paper, paperType, subject, year]);
+  }, [paper, paperType, subject, year]);
 
   useEffect(() => {
     if (!questions.length) return;
@@ -120,7 +212,7 @@ export default function QuizScreen() {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          handleSubmit(true);
+          handleSubmit(true, 0);
           return 0;
         }
         return prev - 1;
@@ -140,25 +232,13 @@ export default function QuizScreen() {
   }, [currentIndex, progressAnim, questions.length]);
 
   const currentQuestion = questions[currentIndex];
+
   const selectedAnswer = currentQuestion
     ? selectedAnswers[currentQuestion.id]
     : undefined;
 
   const stats = useMemo(() => {
-    let attempted = 0;
-    let correct = 0;
-    let wrong = 0;
-
-    questions.forEach((q) => {
-      const ans = selectedAnswers[q.id];
-      if (!ans) return;
-      attempted += 1;
-      if (ans === q.answer) correct += 1;
-      else wrong += 1;
-    });
-
-    const left = questions.length - attempted;
-    return { attempted, correct, wrong, left };
+    return calculateStats(questions, selectedAnswers);
   }, [questions, selectedAnswers]);
 
   const timeText = useMemo(() => {
@@ -169,12 +249,14 @@ export default function QuizScreen() {
     return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
   }, [secondsLeft]);
 
-  const answerQuestion = (option: string) => {
+  const answerQuestion = (optionIndex: number) => {
     if (!currentQuestion) return;
+
+    if (selectedAnswers[currentQuestion.id] !== undefined) return;
 
     setSelectedAnswers((prev) => ({
       ...prev,
-      [currentQuestion.id]: option,
+      [currentQuestion.id]: optionIndex,
     }));
   };
 
@@ -189,15 +271,16 @@ export default function QuizScreen() {
   };
 
   const jumpToQuestion = (index: number) => {
+    if (index < 0 || index >= questions.length) return;
     setCurrentIndex(index);
   };
 
-  const handleSubmit = (forced = false) => {
-    const attempted = stats.attempted;
-    const correct = stats.correct;
-    const wrong = stats.wrong;
-    const left = stats.left;
-    const score = correct;
+  const handleSubmit = (forced = false, forcedTimeLeft?: number) => {
+    const latestQuestions = questionsRef.current;
+    const latestAnswers = selectedAnswersRef.current;
+    const latestStats = calculateStats(latestQuestions, latestAnswers);
+    const timeLeftValue =
+      typeof forcedTimeLeft === "number" ? forcedTimeLeft : secondsLeftRef.current;
 
     const finish = () => {
       router.replace({
@@ -207,14 +290,14 @@ export default function QuizScreen() {
           paperType,
           subject,
           year,
-          total: String(questions.length),
-          attempted: String(attempted),
-          correct: String(correct),
-          wrong: String(wrong),
-          left: String(left),
-          score: String(score),
-          timeLeft: String(secondsLeft),
-          answers: JSON.stringify(selectedAnswers),
+          total: String(latestQuestions.length),
+          attempted: String(latestStats.attempted),
+          correct: String(latestStats.correct),
+          wrong: String(latestStats.wrong),
+          left: String(latestStats.left),
+          score: String(latestStats.correct),
+          timeLeft: String(timeLeftValue),
+          answers: JSON.stringify(latestAnswers),
         },
       });
     };
@@ -226,7 +309,7 @@ export default function QuizScreen() {
 
     Alert.alert(
       "Submit test?",
-      `Attempted: ${attempted}\nCorrect: ${correct}\nWrong: ${wrong}\nLeft: ${left}`,
+      `Attempted: ${latestStats.attempted}\nCorrect: ${latestStats.correct}\nWrong: ${latestStats.wrong}\nLeft: ${latestStats.left}`,
       [
         { text: "Cancel", style: "cancel" },
         { text: "Submit", style: "default", onPress: finish },
@@ -242,14 +325,30 @@ export default function QuizScreen() {
     }));
   };
 
-  const optionState = (option: string) => {
-    if (!currentQuestion || !selectedAnswer) return "idle";
-    if (option === currentQuestion.answer && selectedAnswer !== currentQuestion.answer)
+  const optionState = (optionIndex: number) => {
+    if (!currentQuestion || selectedAnswer === undefined) return "idle";
+
+    if (
+      optionIndex === currentQuestion.answerIndex &&
+      selectedAnswer !== currentQuestion.answerIndex
+    ) {
       return "correct";
-    if (option === selectedAnswer && selectedAnswer !== currentQuestion.answer)
+    }
+
+    if (
+      optionIndex === selectedAnswer &&
+      selectedAnswer !== currentQuestion.answerIndex
+    ) {
       return "wrong";
-    if (option === selectedAnswer && selectedAnswer === currentQuestion.answer)
+    }
+
+    if (
+      optionIndex === selectedAnswer &&
+      selectedAnswer === currentQuestion.answerIndex
+    ) {
       return "correct";
+    }
+
     return "idle";
   };
 
@@ -389,8 +488,8 @@ export default function QuizScreen() {
           <View style={styles.gridWrap}>
             {questions.map((q, index) => {
               const answer = selectedAnswers[q.id];
-              const isAnswered = !!answer;
-              const isCorrect = answer === q.answer;
+              const isAnswered = answer !== undefined;
+              const isCorrect = answer === q.answerIndex;
               const isCurrent = index === currentIndex;
 
               let borderColor = colors.border;
@@ -476,18 +575,35 @@ export default function QuizScreen() {
           <View
             style={[
               styles.questionBox,
-              { borderColor: colors.border, backgroundColor: isDark ? "#0F172A" : "#FBFCFF" },
+              {
+                borderColor: colors.border,
+                backgroundColor: isDark ? "#0F172A" : "#FBFCFF",
+              },
             ]}
           >
+            {currentQuestion.context ? (
+              <Text
+                style={{
+                  color: colors.subText,
+                  fontSize: 14,
+                  lineHeight: 22,
+                  marginBottom: 12,
+                  textAlign: "right",
+                }}
+              >
+                {currentQuestion.context}
+              </Text>
+            ) : null}
+
             <Text style={[styles.questionText, { color: colors.text }]}>
-              {currentQuestion.question}
+              {currentQuestion.questionNumber}. {currentQuestion.question}
             </Text>
           </View>
 
           <View style={styles.optionList}>
             {currentQuestion.options.map((option, index) => {
-              const state = optionState(option);
-              const isSelected = selectedAnswer === option;
+              const state = optionState(index);
+              const isSelected = selectedAnswer === index;
 
               const styleByState =
                 state === "correct"
@@ -508,13 +624,15 @@ export default function QuizScreen() {
                         textColor: colors.text,
                       };
 
-              const rightAnswerVisible = !!selectedAnswer && option === currentQuestion.answer;
+              const rightAnswerVisible =
+                selectedAnswer !== undefined && index === currentQuestion.answerIndex;
 
               return (
                 <TouchableOpacity
-                  key={option}
+                  key={index}
                   activeOpacity={0.85}
-                  onPress={() => answerQuestion(option)}
+                  disabled={selectedAnswer !== undefined}
+                  onPress={() => answerQuestion(index)}
                   style={[
                     styles.optionItem,
                     {
@@ -551,12 +669,7 @@ export default function QuizScreen() {
                     />
                   </View>
 
-                  <Text
-                    style={[
-                      styles.optionLabel,
-                      { color: colors.text },
-                    ]}
-                  >
+                  <Text style={[styles.optionLabel, { color: colors.text }]}>
                     {String.fromCharCode(65 + index)}.
                   </Text>
 
@@ -580,7 +693,32 @@ export default function QuizScreen() {
             })}
           </View>
 
-          {selectedAnswer && (
+          {selectedAnswer !== undefined &&
+            selectedAnswer !== currentQuestion.answerIndex && (
+              <View
+                style={{
+                  marginTop: 12,
+                  padding: 12,
+                  borderRadius: 16,
+                  backgroundColor: isDark ? "rgba(239,68,68,0.08)" : "#FEF2F2",
+                  borderWidth: 1,
+                  borderColor: `${colors.red}30`,
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.red,
+                    fontWeight: "800",
+                    textAlign: "right",
+                  }}
+                >
+                  Correct Answer:{" "}
+                  {currentQuestion.options[currentQuestion.answerIndex] ?? "—"}
+                </Text>
+              </View>
+            )}
+
+          {selectedAnswer !== undefined && (
             <View
               style={[
                 styles.explanationCard,

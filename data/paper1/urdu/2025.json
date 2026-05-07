@@ -1,122 +1,150 @@
+
 [
   {
-    "id": 1,
-    "question": "ایک مربع کی ضلع 12 سینٹی میٹر ہے، اس کا رقبہ کتنا ہوگا؟",
-    "options": [
-      "144 مربع سینٹی میٹر",
-      "132 مربع سینٹی میٹر",
-      "124 مربع سینٹی میٹر",
-      "156 مربع سینٹی میٹر"
-    ],
-    "answer": "144 مربع سینٹی میٹر",
-    "explanation": "مربع کا رقبہ معلوم کرنے کا فارمولا: ضلع × ضلع۔ 12 × 12 = 144 مربع سینٹی میٹر۔"
+    "context": "’خواب میں ہنسنا، دونوں مٹھیوں میں تالیاں بجنے کے باوجود رونا اور اسکول نہ جانے کے لیے مچل مچل جانا بچوں کا پیدائشی حق ہوتا ہے۔ لاکھوں کوششوں کے باوجود نام نہاد بڑے، بچوں کی دنیا آباد کرنے میں ناکام رہے ہیں۔ دنیا کے لمبے چوڑے امیوزمنٹ پارک بشمول امریکہ کے ڈزنی لینڈ میں بھی بچوں کو بلک بلک کر روتا ہوا دیکھا گیا ہے۔ بچوں کا ادب لکھنا اتنا ہی مشکل کام ہے جتنا اصنافِ سخن میں نعت لکھنا۔ کفر اور شرک کے دہکتے الاؤ پر بنے تلوار سے زیادہ تیز اور بال سے زیادہ باریک پل پر چل کر عشق رسول کی وادی میں قدم رکھنا ہوتا ہے۔ بالکل اسی طرح بچوں کا ادب تحریر کرتے وقت اپنی عمر اور بالغ نفسیات کو فرج کے برف خانے میں رکھ کر تار پر کسر ت کرنی پڑتی ہے۔ گھٹنوں کے بل رینگنا پڑتا ہے۔ کمرے میں اپنے آپ کو بند کر کے رونا اور ہنسنا پڑتا ہے۔‘",
+    "questions": [
+      {
+        "question_number": "001",
+        "question": "خواب میں ہنسنا، رونا اور اسکول نہ جانے کے لیے مچلنا اسے مصنف نے کیا کہا ہے؟",
+        "options": {
+          "1": "بچوں کی علامت",
+          "2": "بچوں کی نفسیات",
+          "3": "بچوں کا پیدائشی حق",
+          "4": "بچوں کی خاصیت"
+        },
+        "answer": "3",
+        "explanation": "The first sentence of the paragraph clearly states that these behaviors are the 'birthright' (پیدائشی حق) of children."
+      },
+      {
+        "question_number": "002",
+        "question": "مصنف نے بچوں کو روتے ہوئے کہاں دیکھا ہے؟",
+        "options": {
+          "1": "لندن میں",
+          "2": "ممبئی میں",
+          "3": "ڈزنی لینڈ میں",
+          "4": "کشمیر میں"
+        },
+        "answer": "3",
+        "explanation": "The text mentions that even in large amusement parks like Disneyland in America, children have been seen crying bitterly."
+      },
+      {
+        "question_number": "003",
+        "question": "اصنافِ سخن میں سب سے مشکل فن کیا ہے؟",
+        "options": {
+          "1": "رباعی کہنا",
+          "2": "مثنوی کہنا",
+          "3": "غزل کہنا",
+          "4": "نعت کہنا"
+        },
+        "answer": "4",
+        "explanation": "The author compares the difficulty of writing children's literature to the difficulty of writing 'Naat' (poetry in praise of the Prophet)."
+      },
+      {
+        "question_number": "004",
+        "question": "بچوں کا ادب تحریر کرتے وقت کیا کرنا پڑتا ہے؟",
+        "options": {
+          "1": "مطالعہ کرنا",
+          "2": "خود کو سنبھالنا",
+          "3": "اپنی عمر اور بالغ نفسیات کو قابو میں رکھنا",
+          "4": "تنقید کا دامن تھامنا"
+        },
+        "answer": "3",
+        "explanation": "The passage states that a writer must put aside their adult psychology and age (symbolically putting it in a freezer) to write for children."
+      }
+    ]
   },
   {
-    "id": 2,
-    "question": "اردو زبان میں اسم کی کتنی اقسام ہوتی ہیں؟",
-    "options": [
-      "2",
-      "3",
-      "4",
-      "5"
-    ],
-    "answer": "3",
-    "explanation": "اسم کی بنیادی اقسام: اسم معرفہ، اسم نکرہ، اور اسم ضمیر۔"
+    "context": "Grammar and Literature Section",
+    "questions": [
+      {
+        "question_number": "006",
+        "question": "ناواقف، ناکام، نااہل ان الفاظ میں ’نا‘ کیا کہلاتا ہے؟",
+        "options": {
+          "1": "سابقہ",
+          "2": "لاحقہ",
+          "3": "مرکب",
+          "4": "مفرد"
+        },
+        "answer": "1",
+        "explanation": "A 'Sabiqa' (Prefix) is a letter or word added at the beginning of a word to change its meaning. 'Na' is added at the start here."
+      },
+      {
+        "question_number": "010",
+        "question": "جس جملے میں کسی کام کے کرنے یا نہ کرنے کا حکم دیا جاتا ہے اسے کیا کہتے ہیں؟",
+        "options": {
+          "1": "فجائیہ جملہ",
+          "2": "امریہ جملہ",
+          "3": "استفہامیہ جملہ",
+          "4": "بیانیہ جملہ"
+        },
+        "answer": "2",
+        "explanation": "An 'Amriya' sentence is an imperative sentence used to give commands or orders."
+      },
+      {
+        "question_number": "011",
+        "question": "درج ذیل میں سے کون سا متبادل شمسی حروف کی شناخت کرتا ہے؟",
+        "options": {
+          "1": "ا، ب، ج، ح",
+          "2": "غ، ف، ق، ک",
+          "3": "م، و، ہ، ی",
+          "4": "ش، ص، ض، ط"
+        },
+        "answer": "4",
+        "explanation": "Huroof-e-Shamsi are those letters where the 'Alif-Lam' becomes silent and the letter is doubled. Option 4 contains such letters."
+      },
+      {
+        "question_number": "019",
+        "question": "رباعی میں کل کتنے ارکان ہوتے ہیں؟",
+        "options": {
+          "1": "24",
+          "2": "26",
+          "3": "28",
+          "4": "30"
+        },
+        "answer": "1",
+        "explanation": "Standard Urdu/Persian prosody (Arooz) identifies 24 specific rhythmic patterns (Arkan) for the Rubai form."
+      },
+      {
+        "question_number": "022",
+        "question": "’کائف‘ کا واحد لفظ کیا ہے؟",
+        "options": {
+          "1": "کشف",
+          "2": "قرطاس",
+          "3": "کیفیت",
+          "4": "کیت"
+        },
+        "answer": "3",
+        "explanation": "The word 'Kaif' or 'Kaifiyat' relates to states of being; however, in standard plural rules, 'Kaifiyat' is the singular form (plural: Kaifiyat/Kaif)."
+      }
+    ]
   },
   {
-    "id": 3,
-    "question": "15 اور 20 کا HCF کیا ہے؟",
-    "options": [
-      "3",
-      "5",
-      "10",
-      "15"
-    ],
-    "answer": "5",
-    "explanation": "15 اور 20 دونوں میں 5 سب سے بڑا مشترک عدد ہے۔"
-  },
-  {
-    "id": 4,
-    "question": "لفظ 'کتاب' کس قسم کا اسم ہے؟",
-    "options": [
-      "اسم معرفہ",
-      "اسم نکرہ",
-      "اسم ضمیر",
-      "اسم صفت"
-    ],
-    "answer": "اسم نکرہ",
-    "explanation": "کتاب عام چیز کو ظاہر کرتا ہے، اس لیے یہ اسم نکرہ ہے۔"
-  },
-  {
-    "id": 5,
-    "question": "اگر 2x = 18 ہو تو x کی قیمت کیا ہوگی؟",
-    "options": [
-      "6",
-      "7",
-      "8",
-      "9"
-    ],
-    "answer": "9",
-    "explanation": "2x = 18 ⇒ x = 18 ÷ 2 = 9۔"
-  },
-  {
-    "id": 6,
-    "question": "جملہ مکمل کریں: 'بچے ____ کھیل رہے ہیں۔'",
-    "options": [
-      "میدان میں",
-      "کتاب",
-      "استاد",
-      "درخت"
-    ],
-    "answer": "میدان میں",
-    "explanation": "میدان میں ایک مناسب ظرفی فقرہ ہے جو جملہ مکمل کرتا ہے۔"
-  },
-  {
-    "id": 7,
-    "question": "ایک مثلث کے کتنے ضلع ہوتے ہیں؟",
-    "options": [
-      "2",
-      "3",
-      "4",
-      "5"
-    ],
-    "answer": "3",
-    "explanation": "مثلث ایک تین اضلاع والی شکل ہے۔"
-  },
-  {
-    "id": 8,
-    "question": "'وہ' کس قسم کا لفظ ہے؟",
-    "options": [
-      "اسم",
-      "ضمیر",
-      "فعل",
-      "حرف"
-    ],
-    "answer": "ضمیر",
-    "explanation": "'وہ' کسی اسم کی جگہ استعمال ہوتا ہے، اس لیے ضمیر ہے۔"
-  },
-  {
-    "id": 9,
-    "question": "25 کا مربع کیا ہوگا؟",
-    "options": [
-      "125",
-      "225",
-      "625",
-      "725"
-    ],
-    "answer": "625",
-    "explanation": "25 × 25 = 625۔"
-  },
-  {
-    "id": 10,
-    "question": "درج ذیل میں سے کون سا مترادف ہے؟",
-    "options": [
-      "خوش - مسرور",
-      "اندھیرا - روشنی",
-      "اونچا - نیچا",
-      "دن - رات"
-    ],
-    "answer": "خوش - مسرور",
-    "explanation": "خوش اور مسرور ایک ہی معنی رکھتے ہیں۔"
+    "context": "میں کون ہوں ستم کشِ نیرنگِ روزگار / میں کون ہوں جفائے زمانہ کا اک شکار\nناکامیِ حیات سے دل داغ داغ ہے / سینہ بنا ہے خونِ تمنائے لالہ زار\nہر شئے سے عیاں ہے مری افسردگی کا رنگ / گویا ہے کائنات میرے غم میں سوگوار\nمیں نے خزاں کی گود میں پائی ہے پرورش / شایاں مرے چمن کے نہیں عشرتِ بہار",
+    "questions": [
+      {
+        "question_number": "027",
+        "question": "شاعر کا دل کس وجہ سے داغ داغ ہے؟",
+        "options": {
+          "1": "ناکامیِ حیات",
+          "2": "ناکامیِ ہستی",
+          "3": "ناکامیِ محفل",
+          "4": "ناکامیِ تمنا"
+        },
+        "answer": "1",
+        "explanation": "The second line of the poem explicitly mentions 'ناکامیِ حیات' (failure of life) as the reason for the scarred heart."
+      },
+      {
+        "question_number": "030",
+        "question": "شاعر کی پرورش کہاں ہوئی ہے؟",
+        "options": {
+          "1": "ماں کی آغوش میں",
+          "2": "خزاں کی گود میں",
+          "3": "عشرتِ بہار میں",
+          "4": "بہار چمن میں"
+        },
+        "answer": "2",
+        "explanation": "The last stanza states: 'میں نے خزاں کی گود میں پائی ہے پرورش' (I was raised in the lap of autumn/gloom)."
+      }
+    ]
   }
 ]

@@ -1,12 +1,17 @@
-// data/quizIndex.ts
-
-export type QuizQuestion = {
-  id: number;
+type RawQuestion = {
+  question_number: string;
   question: string;
-  options: string[];
+  options: Record<string, string>;
   answer: string;
   explanation?: string;
 };
+
+type RawSection = {
+  context?: string;
+  questions: RawQuestion[];
+};
+
+type QuizData = RawSection[] | RawQuestion[];
 
 type QuizParams = {
   paper?: string;
@@ -15,7 +20,7 @@ type QuizParams = {
   year?: string;
 };
 
-type QuizLoader = () => QuizQuestion[] | null;
+type QuizLoader = () => QuizData | null;
 
 type QuizEntry = {
   paperLabel: string;
@@ -42,21 +47,24 @@ const makeKey = (
     normalize(year),
   ].join("|");
 
-const safeLoad = (loader: () => unknown, label: string): QuizQuestion[] | null => {
+const safeLoad = (loader: () => unknown, label: string): QuizData | null => {
   try {
-    const data = loader();
+    const loaded = loader();
+    const data = (loaded as any)?.default ?? loaded;
 
     if (!Array.isArray(data)) {
       console.log(`⚠️ Quiz JSON is not an array: ${label}`);
       return null;
     }
 
-    return data as QuizQuestion[];
+    return data as QuizData;
   } catch (error) {
     console.log(`❌ Failed to load quiz JSON: ${label}`, error);
     return null;
   }
 };
+
+  
 
 const QUIZ_LOADERS: Record<string, QuizLoader> = {};
 const QUIZ_ENTRIES: QuizEntry[] = [];
@@ -173,7 +181,7 @@ registerQuiz("Paper 2", "Social Science", "Social Science", "2025", () =>
 // =========================
 // PUBLIC API
 // =========================
-export function getQuizData(params: QuizParams): QuizQuestion[] | null {
+export function getQuizData(params: QuizParams): QuizData | null {
   try {
     const paper = params.paper?.trim() || "";
     const paperType = params.paperType?.trim() || "";
